@@ -60,6 +60,8 @@ main { min-width: 0; flex: 1; }
 .top h1 { flex: 1; margin: 0; color: var(--navy); font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
 #today { color: var(--muted); font-size: 13px; }
 #menu { display: none; padding: 6px 10px; border-color: var(--line); color: var(--navy); background: #fff; }
+.top-logout { flex: 0 0 auto; padding: 7px 11px; border-color: var(--line); color: var(--navy); background: #fff; white-space: nowrap; }
+.top-logout:hover { border-color: #bdcbd7; background: #f3f6f8; }
 #view { max-width: 1600px; margin: 0 auto; padding: clamp(22px, 3.5vw, 40px) clamp(20px, 4vw, 46px); }
 #view[aria-busy="true"] { opacity: .65; }
 

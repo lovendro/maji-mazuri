@@ -491,12 +491,15 @@ $('#change-password').addEventListener('click', () => {
   });
 });
 
-$('#logout').addEventListener('click', async () => {
+async function signOut() {
   try { await api('/api/logout', { method: 'POST', body: '{}' }); }
   catch (error) { notify(error.message); return; }
   currentUser = null;
   await loadSession();
-});
+}
+
+$('#logout').addEventListener('click', signOut);
+$('#top-logout').addEventListener('click', signOut);
 
 $('#menu').addEventListener('click', () => {
   const isOpen = $('#side').classList.toggle('open');
