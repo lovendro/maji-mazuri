@@ -168,33 +168,60 @@ function appointmentTable(appointments, actions = false) {
 
 async function dashboardView() {
   const data = await api('/api/dashboard');
-  return `<div class="page-intro"><p class="eyebrow">Facility operations</p><h2>Welcome, ${esc(currentUser.username)}</h2><p>Today's activity and current inpatient census.</p></div>
-    <div class="safety-banner"><b>Clinical-use warning</b><span>Starter software, not validated for clinical decisions or approved for real patient records. Verify schedules and workflows with your facility.</span></div>
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const nextAppointments = data.upcomingAppointments.slice(0, 5);
+  const agenda = nextAppointments.length ? nextAppointments.map(item => `
+    <article class="agenda-item">
+      <div class="agenda-time">${esc(item.time)}</div>
+      <div class="agenda-details"><b>${esc(item.patientName)}</b><span>${esc(item.dept)} · ${esc(item.doctor)}</span></div>
+      ${statusTag(item.status)}
+    </article>`).join('') : `<div class="empty-state"><span class="empty-mark" aria-hidden="true">+</span><b>Your schedule is clear</b><span>Appointments booked for today will appear here.</span><button id="empty-book-appointment" class="alt" type="button">Book an appointment</button></div>`;
+  const census = data.wardCensus.length ? patientTable(data.wardCensus) : `<div class="empty-state compact-empty"><span class="empty-mark" aria-hidden="true">+</span><b>No current admissions</b><span>Admitted patients will appear here.</span></div>`;
+  return `<section class="welcome-banner">
+      <div class="welcome-copy">
+        <p class="eyebrow">MAJI MAZURI · FACILITY OVERVIEW</p>
+        <h2>${greeting}, ${esc(currentUser.username)}.</h2>
+        <p>Your care teams' activity, all in one place.</p>
+        <div class="welcome-actions">
+          <button id="quick-register" type="button">Register a patient <span aria-hidden="true">→</span></button>
+          <button id="quick-appointment" class="welcome-secondary" type="button">Book appointment</button>
+        </div>
+      </div>
+      <div class="welcome-art" aria-hidden="true">
+        <span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span>
+        <span class="art-drop"><svg viewBox="0 0 96 112"><path d="M48 4C35 26 13 51 13 72a35 35 0 0 0 70 0C83 51 61 26 48 4Z" fill="currentColor"/><path d="M48 83V51M35 67h26" fill="none" stroke="#1b6c66" stroke-linecap="square" stroke-width="6"/></svg></span>
+      </div>
+      <div class="welcome-date"><span class="date-dot"></span>${esc(formatDate(todayISO(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))}</div>
+    </section>
+    <div class="safety-banner"><b>School project demo</b><span>Use fictional records only. This demonstration is not validated for real patient information or clinical decisions.</span></div>
     <div class="stats">
-      <div class="stat"><span>Registered patients</span><b>${data.patients}</b><small>Active facility register</small></div>
-      <div class="stat g"><span>Currently admitted</span><b>${data.admitted}</b><small>Inpatient census</small></div>
-      <div class="stat"><span>Appointments today</span><b>${data.appointmentsToday}</b><small>${esc(formatDate(todayISO(), { weekday: 'long', day: 'numeric', month: 'long' }))}</small></div>
-      <div class="stat a"><span>Overdue vaccines</span><b>${data.overdueVaccines}</b><small>Based on the editable demo schedule</small></div>
+      <a class="stat stat-link" href="#patients"><span class="stat-icon blue-icon" aria-hidden="true">P</span><span class="stat-label">Registered patients</span><b>${data.patients}</b><small>View patient register <span aria-hidden="true">→</span></small></a>
+      <a class="stat stat-link g" href="#patients"><span class="stat-icon green-icon" aria-hidden="true">+</span><span class="stat-label">Currently admitted</span><b>${data.admitted}</b><small>Inpatient census <span aria-hidden="true">→</span></small></a>
+      <a class="stat stat-link" href="#appointments"><span class="stat-icon blue-icon" aria-hidden="true">◷</span><span class="stat-label">Appointments today</span><b>${data.appointmentsToday}</b><small>See today's schedule <span aria-hidden="true">→</span></small></a>
+      <a class="stat stat-link a" href="#immunizations"><span class="stat-icon amber-icon" aria-hidden="true">✳</span><span class="stat-label">Overdue vaccines*</span><b>${data.overdueVaccines}</b><small>Demo schedule only <span aria-hidden="true">→</span></small></a>
     </div>
     <div class="grid2">
-      <section class="panel"><div class="panel-heading"><h2>Today's appointments</h2><a href="#appointments">View all</a></div>${appointmentTable(data.upcomingAppointments)}</section>
-      <section class="panel"><div class="panel-heading"><h2>Inpatient census</h2><a href="#patients">Patient register</a></div>${patientTable(data.wardCensus)}</section>
-    </div>`;
+      <section class="panel dashboard-panel"><div class="panel-heading"><div><p class="eyebrow">ON THE SCHEDULE</p><h2>Today's appointments</h2></div><a href="#appointments">View schedule <span aria-hidden="true">→</span></a></div><div class="agenda">${agenda}</div></section>
+      <section class="panel dashboard-panel"><div class="panel-heading"><div><p class="eyebrow">INPATIENT CARE</p><h2>Ward census</h2></div><a href="#patients">Patient register <span aria-hidden="true">→</span></a></div><div class="census-list">${census}</div></section>
+    </div>
+    <p class="demo-footnote">*Vaccine indicators are based on the sample schedule and are for demonstration only.</p>`;
 }
 
 async function patientsView() {
   const { patients } = await api('/api/patients');
-  return `<div class="page-intro"><p class="eyebrow">Care register</p><h2>Patient records</h2><p>Search the local facility register or create a patient record.</p></div>
-    <div class="bar"><input id="patient-search" type="search" placeholder="Search patient or guardian" aria-label="Search patients"><button id="add-patient" type="button">Register patient</button></div>
+  return `<div class="page-intro"><p class="eyebrow">CARE REGISTER</p><h2>Patient records</h2><p>Search, review, and manage your patient list.</p></div>
+    <div class="bar page-toolbar"><label class="search-field"><span class="search-icon" aria-hidden="true">⌕</span><input id="patient-search" type="search" placeholder="Search patient or guardian" aria-label="Search patients"></label><span class="result-count" id="patient-count"><b>${patients.length}</b> ${patients.length === 1 ? 'patient' : 'patients'}</span><button id="add-patient" type="button"><span aria-hidden="true">+</span> Register patient</button></div>
     <div class="panel table-panel" id="patient-list">${patientTable(patients, ['admin', 'clinician'].includes(currentUser.role))}</div>`;
 }
 
 async function appointmentsView() {
   const { appointments } = await api('/api/appointments');
   const ordered = appointments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  return `<div class="page-intro"><p class="eyebrow">Scheduling</p><h2>Appointments</h2><p>Book visits and track appointment completion.</p></div>
-    <div class="bar"><button id="add-appointment" type="button">Book appointment</button></div>
-    <div class="panel table-panel">${appointmentTable(ordered, true)}</div>`;
+  const scheduled = appointments.filter(item => item.status === 'Scheduled').length;
+  return `<div class="page-intro"><p class="eyebrow">CARE COORDINATION</p><h2>Appointments</h2><p>Keep visits organized and follow every appointment through to completion.</p></div>
+    <div class="appointment-summary"><div><span class="summary-icon" aria-hidden="true">◷</span><span><b>${scheduled}</b> upcoming ${scheduled === 1 ? 'visit' : 'visits'}</span></div><button id="add-appointment" type="button"><span aria-hidden="true">+</span> Book appointment</button></div>
+    <div class="panel table-panel appointments-panel">${appointmentTable(ordered, true)}</div>`;
 }
 
 function vaccinationState(patient, vaccine) {
@@ -219,12 +246,13 @@ async function immunizationsView() {
       const patientVaccine = { ...patient, vaccineId: patient.given[vaccine.id] ? vaccine.id : '' };
       const state = vaccinationState(patientVaccine, vaccine);
       const date = patient.given[vaccine.id];
-      const label = `${vaccine.name}${date ? ` · recorded ${formatDate(date)}` : state === 'over' ? ' · overdue*' : state === 'due' ? ' · due*' : ''}`;
+      const stateLabel = date ? `Recorded ${formatDate(date)}` : state === 'over' ? 'Overdue · demo' : state === 'due' ? 'Due · demo' : 'Not yet due';
+      const label = `${vaccine.name} — ${stateLabel}`;
       if (date) {
-        return `<span class="vax given" title="Recorded ${esc(formatDate(date))}">${esc(label)}</span>${currentUser.role === 'admin' ? `<button class="danger compact" type="button" data-remove-vaccine="${patient.id}" data-vaccine="${esc(vaccine.id)}" aria-label="Remove ${esc(vaccine.name)} record for ${esc(patient.name)}">Remove</button>` : ''}`;
+        return `<div class="vaccine-entry"><span class="vaccine-dot given-dot"></span><span class="vaccine-name">${esc(vaccine.name)}</span><span class="vaccine-status">Recorded ${esc(formatDate(date))}</span>${currentUser.role === 'admin' ? `<button class="vaccine-remove" type="button" data-remove-vaccine="${patient.id}" data-vaccine="${esc(vaccine.id)}" aria-label="Remove ${esc(vaccine.name)} record for ${esc(patient.name)}">Remove</button>` : ''}</div>`;
       }
-      if (!['admin', 'clinician'].includes(currentUser.role)) return `<span class="vax ${state}">${esc(label)}</span>`;
-      return `<button class="vax ${state}" type="button" data-record-vaccine="${patient.id}" data-vaccine="${esc(vaccine.id)}" title="Record administration date">${esc(label)}</button>`;
+      if (!['admin', 'clinician'].includes(currentUser.role)) return `<div class="vaccine-entry ${state}"><span class="vaccine-dot ${state}-dot"></span><span class="vaccine-name">${esc(vaccine.name)}</span><span class="vaccine-status">${esc(stateLabel)}</span></div>`;
+      return `<button class="vaccine-entry ${state}" type="button" data-record-vaccine="${patient.id}" data-vaccine="${esc(vaccine.id)}" title="Record administration date"><span class="vaccine-dot ${state}-dot"></span><span class="vaccine-name">${esc(vaccine.name)}</span><span class="vaccine-status">${esc(stateLabel)}</span><span class="vaccine-action" aria-hidden="true">+</span></button>`;
     }).join('')}</td>
   </tr>`).join('');
   return `<div class="page-intro"><p class="eyebrow">Preventive care</p><h2>Immunization records</h2><p>Record an administration date or review recorded doses.</p></div>
@@ -301,6 +329,11 @@ async function show(viewName) {
 }
 
 function bind(view) {
+  if (view === 'dashboard') {
+    $('#quick-register').onclick = () => patientForm();
+    $('#quick-appointment').onclick = () => appointmentForm();
+    $('#empty-book-appointment')?.addEventListener('click', () => appointmentForm());
+  }
   if (view === 'patients') {
     let searchSequence = 0;
     $('#add-patient').onclick = () => patientForm();
@@ -311,6 +344,7 @@ function bind(view) {
         const { patients } = await api(`/api/patients?q=${encodeURIComponent(query)}`);
         if (sequence !== searchSequence || !$('#patient-list')) return;
         $('#patient-list').innerHTML = patientTable(patients, ['admin', 'clinician'].includes(currentUser.role));
+        $('#patient-count').innerHTML = `<b>${patients.length}</b> ${patients.length === 1 ? 'match' : 'matches'}`;
         bindPatientEdit();
       } catch (error) {
         if (sequence === searchSequence) notify(error.message);

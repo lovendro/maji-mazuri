@@ -1,6 +1,6 @@
 # Maji Mazuri HMIS
 
-A locally hosted starter application for managing a paediatric patient register, appointments, and immunization records. The browser interface uses a Node.js API and a SQLite database; records are no longer stored in browser `localStorage`.
+A locally hosted **school-project demonstration** of a paediatric hospital information system. It includes a patient register, appointments, staff access, and an immunization tracker. The browser interface uses a Node.js API and a SQLite database; records are no longer stored in browser `localStorage`.
 
 ## Important safety and privacy notice
 
@@ -59,6 +59,18 @@ Stop the server with `Ctrl+C`. The application binds to the local computer only.
 - Appointment booking and status updates
 - Immunization schedule view and dated administration records
 - Facility dashboard with current inpatient census and today's appointments
+
+## Demonstrate an end-to-end workflow
+
+Use fictional names and details only:
+
+1. Sign in as the administrator created during first-run setup.
+2. Open **Patients** and register a fictional patient.
+3. Use **Edit** to update the fictional record, then search for it in the patient list.
+4. Open **Appointments**, book a visit for the patient, then mark it complete or cancel it.
+5. Open **Immunizations** and record a fictional administration date.
+6. Open **Staff accounts** to create a test receptionist or clinician account and review the demo audit log.
+7. Sign out and sign back in to show that records persist in SQLite.
 
 ## Development checks
 
