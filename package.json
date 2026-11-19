@@ -1,0 +1,19 @@
+{
+  "name": "maji-mazuri-hmis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Locally hosted hospital information system starter for Maji Mazuri Children's Hospital",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check js/app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0"
+  }
+}

@@ -1,35 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maji Mazuri Children's Hospital · HMIS</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123e70">
+  <meta name="referrer" content="no-referrer">
+  <title>Maji Mazuri Children's Hospital · HMIS</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<aside class="side" id="side">
-  <div class="brand">
-    <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true"><path d="M20 3C13 14 8 20 8 27a12 12 0 0 0 24 0C32 20 27 14 20 3z" fill="#fff"/><path d="M20 33v-12m-5 6h10" stroke="#1faa59" stroke-width="3.4" stroke-linecap="round"/></svg>
-    <div><b>Maji Mazuri</b><small>Children's Hospital</small></div>
+  <section id="auth-screen" class="auth-screen" aria-live="polite"></section>
+  <div id="app-shell" class="app-shell" hidden>
+    <aside class="side" id="side">
+      <a class="brand" href="#dashboard" aria-label="Maji Mazuri dashboard">
+        <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true"><path d="M20 3C13 14 8 20 8 27a12 12 0 0 0 24 0C32 20 27 14 20 3z" fill="#fff"/><path d="M20 33v-12m-5 6h10" stroke="#15965a" stroke-width="3.4" stroke-linecap="square"/></svg>
+        <span><b>Maji Mazuri</b><small>Children's Hospital</small></span>
+      </a>
+      <nav id="nav" aria-label="Main navigation">
+        <a href="#dashboard" data-v="dashboard">Overview</a>
+        <a href="#patients" data-v="patients">Patients</a>
+        <a href="#appointments" data-v="appointments">Appointments</a>
+        <a href="#immunizations" data-v="immunizations">Immunizations</a>
+        <a href="#users" data-v="users" data-admin-only hidden>Staff accounts</a>
+      </nav>
+      <div class="side-bottom">
+        <p id="user-label"></p>
+        <button id="change-password" class="side-action" type="button">Change password</button>
+        <button id="logout" class="side-action" type="button">Sign out</button>
+        <p class="foot">Local facility server<br>Access is recorded</p>
+      </div>
+    </aside>
+    <main>
+      <header class="top">
+        <button id="menu" type="button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <h1 id="title"></h1>
+        <span id="today"></span>
+      </header>
+      <section id="notice" class="notice" role="status" hidden></section>
+      <section id="view" aria-live="polite"></section>
+    </main>
   </div>
-  <nav id="nav">
-    <a href="#dashboard" data-v="dashboard">Dashboard</a>
-    <a href="#patients" data-v="patients">Young patients</a>
-    <a href="#appointments" data-v="appointments">Appointments</a>
-    <a href="#immunizations" data-v="immunizations">Immunizations</a>
-  </nav>
-  <p class="foot">HMIS v0.1<br>Demo data stored in your browser</p>
-</aside>
-<main>
-  <header class="top">
-    <button id="menu" aria-label="Menu">☰</button>
-    <h1 id="title"></h1>
-    <span id="today"></span>
-  </header>
-  <section id="view"></section>
-</main>
-<dialog id="dlg"><form method="dialog" id="form"></form></dialog>
-<script src="js/app.js"></script>
+  <dialog id="dlg"><form id="form"></form></dialog>
+  <script src="/js/app.js" defer></script>
 </body>
 </html>
